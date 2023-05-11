@@ -1,4 +1,4 @@
-public class Produit implements Unit{
+public class Produit {
 
     private int codeProduit;
     private String description;
@@ -84,6 +84,7 @@ public class Produit implements Unit{
         this.quantiteMaximale = quantiteMaximale;
     }
 
+
     @Override
     public String toString() {
         return "Produit{" +
@@ -97,4 +98,6 @@ public class Produit implements Unit{
                 ", quantiteMaximale=" + quantiteMaximale +
                 '}';
     }
+
+
 }
