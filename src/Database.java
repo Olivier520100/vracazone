@@ -9,18 +9,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TimeZone;
 
-public class Database{
+public class Database implements Unit{
 
-    HashMap<String, Double> unitMasse = new HashMap<String, Double>() {{
-        put("mg", 1.0);
-        put("g", 1000.0);
-        put("kg", 1000000.0);
-    }};
-    HashMap<String, Double> unitVolume = new HashMap<String, Double>() {{
-        put("ml", 1.0);
-        put("cl", 10.0);
-        put("L", 1000.0);
-    }};
+
     private HashMap<String, Client> clientHashMap = new HashMap<String, Client>();
     // HashMap pour stocker les produits avec leur code produit comme clé
     private HashMap<Integer, Produit> produitHashMap = new HashMap<Integer, Produit>();
@@ -83,9 +74,9 @@ public class Database{
                 // Vérifier si le code produit existe déjà dans le HashMap
                 if (produitHashMap.containsKey(codeProduit)) {
                     System.out.println("Erreur dans le fichier. Verifier" + description);
-                } else if (!(Unit.unitMasse.contains(unite)) && !(Unit.unitVolume.contains(unite))) {
+                } else if (!(unitMasse.containsKey(unite)) && !(unitVolume.containsKey(unite))) {
                     System.out.println("Unite inconnue pour " + description + "avec" + unite);
-                } else if (prixCoutant >= (0.8 * prixUnitaire)) {
+                } else if (prixCoutant >= ( prixUnitaire/1.2)) {
                         System.out.println("Erreur dans le fichier. Le prix coûtant doit être inférieur d'au moins 20% au prix unitaire.");
                 } else {
                     // Créer un nouvel objet produit et l'ajouter au HashMap
@@ -157,7 +148,7 @@ public class Database{
                             erreurDansFichier = true;
                             codeProduitAvecErreur = currentCodeProduit;
 
-                        } else if (!Unit.unitMasse.contains(currentUnite) && !Unit.unitVolume.contains(currentUnite)) {
+                        } else if (!unitMasse.containsKey(currentUnite) && !unitVolume.containsKey(currentUnite)) {
                             errorType = 6;
                             erreurDansFichier = true;
                             codeProduitAvecErreur = currentCodeProduit;

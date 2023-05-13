@@ -1,15 +1,16 @@
+import java.util.HashMap;
 import java.util.HashSet;
 
 public interface Unit {
-    HashSet<String> unitMasse = new HashSet<String>() {{
-        add("mg");
-        add("g");
-        add("kg");
+    HashMap<String, Double> unitMasse = new HashMap<String, Double>() {{
+        put("mg", 1.0);
+        put("g", 1000.0);
+        put("kg", 1000000.0);
     }};
-    HashSet<String> unitVolume = new HashSet<String>() {{
-        add("ml");
-        add("cl");
-        add("L");
+    HashMap<String, Double> unitVolume = new HashMap<String, Double>() {{
+        put("ml", 1.0);
+        put("cl", 10.0);
+        put("L", 1000.0);
     }};
 
 }
