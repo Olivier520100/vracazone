@@ -4,31 +4,29 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.TimeZone;
+import java.util.*;
 
 public class Database implements Unit{
 
 
-    private HashMap<String, Client> clientHashMap = new HashMap<String, Client>();
+    private LinkedHashMap<String, Client> clientHashMap = new LinkedHashMap<String, Client>();
     // HashMap pour stocker les produits avec leur code produit comme clé
-    private HashMap<Integer, Produit> produitHashMap = new HashMap<Integer, Produit>();
+    private LinkedHashMap<Integer, Produit> produitHashMap = new LinkedHashMap<Integer, Produit>();
 
     // HashMap pour stocker les paniers avec leur code transaction comme clé
-    private HashMap<String, Panier> panierHashMap = new HashMap<String, Panier>();
+    private LinkedHashMap<String, Panier> panierHashMap = new LinkedHashMap<String, Panier>();
+    private ArrayList<FacturePanier> facturePanierArrayList = new ArrayList<>();
 
-    /**
-     * Constructeur de la classe Database.
-     * Ce constructeur initialise les données des clients et des produits à partir des fichiers clients.dat et produits.dat.
-     */
-    public Database() {
-        // HashMap pour stocker les clients avec leur identifiant comme clé
+    private boolean dataLoaded = false;
 
+    public void importFiles(String fichierClients, String fichierProduits, String fichierPaniers) {
+        loadClients(fichierClients);
+        loadProduits(fichierProduits);
+        loadPaniers(fichierPaniers);
+    }
 
-        // Bloc try-catch pour gérer les exceptions liées aux fichiers et aux entrées-sorties
-        try (DataInputStream fichierClient = new DataInputStream(new FileInputStream(("./database/clients.dat")))) {
+    public void loadClients(String fichier) {
+        try (DataInputStream fichierClient = new DataInputStream(new FileInputStream((fichier)))) {
             String identifianClient;
             String nomClient;
             Client clientObjectPointer;
@@ -50,8 +48,11 @@ public class Database implements Unit{
         } catch (IOException e) {
             System.out.println("Erreur d'entrées-sorties");
         }
+    }
+
+    public void loadProduits(String fichier) {
         // Thread pour lire les données des produits à partir du fichier produits.dat
-        try (DataInputStream fichierProduit = new DataInputStream(new FileInputStream(("./database/produits.dat")))) {
+        try (DataInputStream fichierProduit = new DataInputStream(new FileInputStream((fichier)))) {
             int codeProduit;
             String description;
             boolean produitAlimentaire;
@@ -71,13 +72,14 @@ public class Database implements Unit{
                 prixUnitaire = fichierProduit.readDouble();
                 unite = fichierProduit.readUTF();
                 quantiteMaximale = fichierProduit.readDouble();
+
                 // Vérifier si le code produit existe déjà dans le HashMap
                 if (produitHashMap.containsKey(codeProduit)) {
                     System.out.println("Erreur dans le fichier. Verifier" + description);
                 } else if (!(unitMasse.containsKey(unite)) && !(unitVolume.containsKey(unite))) {
                     System.out.println("Unite inconnue pour " + description + "avec" + unite);
                 } else if (prixCoutant >= ( prixUnitaire/1.2)) {
-                        System.out.println("Erreur dans le fichier. Le prix coûtant doit être inférieur d'au moins 20% au prix unitaire.");
+                    System.out.println("Erreur dans le fichier. Le prix coûtant doit être inférieur d'au moins 20% au prix unitaire.");
                 } else {
                     // Créer un nouvel objet produit et l'ajouter au HashMap
                     produitObjectPointer = new Produit(codeProduit, description, produitAlimentaire, isSolide, prixCoutant, prixUnitaire, unite, quantiteMaximale);
@@ -89,8 +91,18 @@ public class Database implements Unit{
         } catch (IOException e) {
             System.out.println("Erreur d'entrées-sorties");
         }
+    }
 
-        try (DataInputStream fichierPanier = new DataInputStream(new FileInputStream(("./database/paniers.bin")))) {
+    public HashMap<String, Client> getClientHashMap() {
+        return clientHashMap;
+    }
+
+    public HashMap<String, Panier> getPanierHashMap() {
+        return panierHashMap;
+    }
+
+    public void loadPaniers(String fichier) {
+        try (DataInputStream fichierPanier = new DataInputStream(new FileInputStream((fichier)))) {
 
             String identificationTransaction;
             String identifiantClient;
@@ -238,38 +250,50 @@ public class Database implements Unit{
         } catch (IOException e) {
             System.out.println("Erreur d'entrées-sorties");
         }
-        GenerateurFacture generateurFacture = new GenerateurFacture();
-        generateurFacture.genererFactures(panierHashMap,produitHashMap);
-
-        ArrayList<Client>clientList = new ArrayList<Client>(clientHashMap.values());
-        ArrayList<Produit>produitList = new ArrayList<Produit>(produitHashMap.values());
-        ArrayList<Panier>panierList = new ArrayList<Panier>(panierHashMap.values());
+    }
 
 
-        /*
-        for (Client client : clientList) {
-            System.out.println(client);
-            System.out.println(); // prints a newline character
+
+    public void generateFactures() {
+
+        final double TAUX_TAXE = 0.15;
+        for (Panier panier : panierHashMap.values()) {
+            String idTransaction = panier.getIdentificationTransaction();
+            String dateTime = unixATimeStamp(panier.getTempsDepuisUnixEpoch() / 1000);
+            double sousTotal = 0.0;
+            double taxes = 0.0;
+            for (int i = 0; i < panier.getQuantite().length; i++) {
+                Produit produit = produitHashMap.get(panier.getCodesProduit()[i]);
+                double quantite = panier.getQuantite()[i];
+                double prixUnitaire = produit.getPrixUnitaire();
+
+                sousTotal += quantite * prixUnitaire;
+                if (!produit.getProduitAlimentaire()) {
+                    taxes += quantite * prixUnitaire * TAUX_TAXE;
+                }
+            }
+            double total = sousTotal + taxes;
+            facturePanierArrayList.add(new FacturePanier(idTransaction,dateTime,sousTotal,taxes,total));
         }
-        */
-        for (Produit produit : produitList) {
-            System.out.println(produit);
-            System.out.println(); // prints a newline character
-        }
+    }
+
+    public void printData() {
+
+        ArrayList<Panier> panierList = new ArrayList<>(panierHashMap.values());
+
+
 
         for (Panier panier : panierList) {
             System.out.println(panier);
             System.out.println(); // prints a newline character
         }
-
-
     }
     public String unixATimeStamp(long tempsUnix){
-        String dateText;
+        String dateTexte;
         SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
         formatDate.setTimeZone(TimeZone.getTimeZone("UTC"));
-        dateText = formatDate.format(tempsUnix);
-        return (dateText);
+        dateTexte = formatDate.format(new Date(tempsUnix * 1000L));
+        return dateTexte;
     }
     public double convertUnits(double quantity, String fromUnit, String toUnit) {
         double result = quantity;
@@ -292,5 +316,12 @@ public class Database implements Unit{
         return result;
     }
 
+    public ArrayList<FacturePanier> getFacturePanierArrayList() {
+        return facturePanierArrayList;
+    }
+
+    public HashMap<Integer, Produit> getProduitHashMap() {
+        return produitHashMap;
+    }
 }
 

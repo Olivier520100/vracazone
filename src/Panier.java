@@ -2,7 +2,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.TimeZone;
 
-public class Panier {
+public class Panier implements Comparable{
 
     private String identificationTransaction;
     private String identifiantClient;
@@ -35,6 +35,11 @@ public class Panier {
                 '}';
     }
 
+    public int compareTo(Object o) {
+        Panier panierComparaison = (Panier) o;
+        return Long.compare( this.tempsDepuisUnixEpoch, panierComparaison.tempsDepuisUnixEpoch);
+
+    }
     public String getIdentificationTransaction() {
         return identificationTransaction;
     }
