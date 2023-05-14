@@ -9,22 +9,34 @@ import java.util.*;
 public class Database implements Unit{
 
 
+    // HashMap pour stocker les clients avec leur identifiant comme clé
     private final LinkedHashMap<String, Client> clientHashMap = new LinkedHashMap<String, Client>();
     // HashMap pour stocker les produits avec leur code produit comme clé
     private final LinkedHashMap<Integer, Produit> produitHashMap = new LinkedHashMap<Integer, Produit>();
-
     // HashMap pour stocker les paniers avec leur code transaction comme clé
     private final LinkedHashMap<String, Panier> panierHashMap = new LinkedHashMap<String, Panier>();
     private final ArrayList<FacturePanier> facturePanierArrayList = new ArrayList<>();
 
     private final boolean dataLoaded = false;
 
+    /**
+     * Importe les fichiers de données dans la base de données.
+     *
+     * @param fichierClients  Le fichier contenant les données des clients.
+     * @param fichierProduits Le fichier contenant les données des produits.
+     * @param fichierPaniers  Le fichier contenant les données des paniers.
+     */
     public void importFiles(String fichierClients, String fichierProduits, String fichierPaniers) {
         loadClients(fichierClients);
         loadProduits(fichierProduits);
         loadPaniers(fichierPaniers);
     }
 
+    /**
+     * Charge les données des clients à partir du fichier spécifié.
+     *
+     * @param fichier Le fichier contenant les données des clients.
+     */
     public void loadClients(String fichier) {
         try (DataInputStream fichierClient = new DataInputStream(new FileInputStream((fichier)))) {
             String identifianClient;
@@ -50,8 +62,12 @@ public class Database implements Unit{
         }
     }
 
+    /**
+     * Charge les données des produits à partir du fichier spécifié.
+     *
+     * @param fichier Le fichier contenant les données des produits.
+     */
     public void loadProduits(String fichier) {
-        // Thread pour lire les données des produits à partir du fichier produits.dat
         try (DataInputStream fichierProduit = new DataInputStream(new FileInputStream((fichier)))) {
             int codeProduit;
             String description;
@@ -75,9 +91,9 @@ public class Database implements Unit{
 
                 // Vérifier si le code produit existe déjà dans le HashMap
                 if (produitHashMap.containsKey(codeProduit)) {
-                    System.out.println("Erreur dans le fichier. Verifier" + description);
+                    System.out.println("Erreur dans le fichier. Vérifiez " + description);
                 } else if (!(unitMasse.containsKey(unite)) && !(unitVolume.containsKey(unite))) {
-                    System.out.println("Unite inconnue pour " + description + "avec" + unite);
+                    System.out.println("Unité inconnue pour " + description + " avec " + unite);
                 } else if (!(prixUnitaire/1.2 >= (prixCoutant))) {
                     System.out.println("Erreur dans le fichier. Le prix coûtant doit être inférieur d'au moins 20% au prix unitaire.");
                 } else {
@@ -87,20 +103,36 @@ public class Database implements Unit{
                 }
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Fichier client non trouvé");
+            System.out.println("Fichier produit non trouvé");
         } catch (IOException e) {
             System.out.println("Erreur d'entrées-sorties");
         }
     }
 
-    public HashMap<String, Client> getClientHashMap() {
+    // Méthodes pour accéder aux HashMaps
+
+    /**
+     * Retourne le HashMap des clients.
+     *
+     * @return Le HashMap des clients.
+     */
+    public LinkedHashMap<String, Client> getClientHashMap() {
         return clientHashMap;
     }
 
-    public HashMap<String, Panier> getPanierHashMap() {
+    /**
+     * Retourne le HashMap des paniers.
+     *
+     * @return Le HashMap des paniers.
+     */
+    public LinkedHashMap<String, Panier> getPanierHashMap() {
         return panierHashMap;
     }
-
+    /**
+     * Charge les données des paniers à partir du fichier spécifié.
+     *
+     * @param fichier Le fichier contenant les données des paniers.
+     */
     public void loadPaniers(String fichier) {
         try (DataInputStream fichierPanier = new DataInputStream(new FileInputStream((fichier)))) {
 
@@ -254,8 +286,8 @@ public class Database implements Unit{
 
 
 
+    // Méthode pour générer les factures des paniers
     public void generateFactures() {
-
         final double TAUX_TAXE = 0.15;
         for (Panier panier : panierHashMap.values()) {
             String idTransaction = panier.getIdentificationTransaction();
@@ -273,43 +305,45 @@ public class Database implements Unit{
                 }
             }
             double total = sousTotal + taxes;
-            facturePanierArrayList.add(new FacturePanier(idTransaction,dateTime,sousTotal,taxes,total));
+            facturePanierArrayList.add(new FacturePanier(idTransaction, dateTime, sousTotal, taxes, total));
         }
     }
 
-    public void printData() {
-
-        ArrayList<Produit> produitList = new ArrayList<>(produitHashMap.values());
-
-
-
-        for (Produit panier : produitList) {
-            System.out.println(panier);
-            System.out.println(); // prints a newline character
-        }
-    }
-    public String unixATimeStamp(long tempsUnix){
+    /**
+     * Convertit un timestamp Unix en une chaîne de caractères au format yyyy-MM-dd HH:mm z.
+     *
+     * @param tempsUnix Le timestamp Unix.
+     * @return La chaîne de caractères représentant la date et l'heure.
+     */
+    public String unixATimeStamp(long tempsUnix) {
         String dateTexte;
         SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
         formatDate.setTimeZone(TimeZone.getTimeZone("UTC"));
         dateTexte = formatDate.format(new Date(tempsUnix * 1000L));
         return dateTexte;
     }
+
+    /**
+     * Convertit une quantité d'une unité à une autre.
+     *
+     * @param quantity  La quantité à convertir.
+     * @param fromUnit  L'unité de départ.
+     * @param toUnit    L'unité de destination.
+     * @return La quantité convertie.
+     */
     public double convertUnits(double quantity, String fromUnit, String toUnit) {
         double result = quantity;
 
-        // Check if both units are mass units
+        // Vérifier si les deux unités sont des unités de masse
         if (unitMasse.containsKey(fromUnit) && unitMasse.containsKey(toUnit)) {
             double fromFactor = unitMasse.get(fromUnit);
             double toFactor = unitMasse.get(toUnit);
             result = (quantity * fromFactor) / toFactor;
-        }
-        else if (unitVolume.containsKey(fromUnit) && unitVolume.containsKey(toUnit)) {
+        } else if (unitVolume.containsKey(fromUnit) && unitVolume.containsKey(toUnit)) {
             double fromFactor = unitVolume.get(fromUnit);
             double toFactor = unitVolume.get(toUnit);
             result = (quantity * fromFactor) / toFactor;
-        }
-        else {
+        } else {
             System.out.println("Conversion Impossible");
         }
 

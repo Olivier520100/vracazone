@@ -9,7 +9,20 @@ public class Produit {
     private String unite;
     private double  quantiteMaximale;
 
-    public Produit(Integer codeProduit, String description, Boolean produitAlimentaire, Boolean isSolide, Double prixCoutant, Double prixUnitaire, String unite, Double quantiteMaximale) {
+    /**
+     * Constructeur de la classe Produit.
+     *
+     * @param codeProduit         Le code du produit.
+     * @param description         La description du produit.
+     * @param produitAlimentaire  Indique si le produit est un produit alimentaire.
+     * @param isSolide            Indique si le produit est solide.
+     * @param prixCoutant         Le prix coûtant du produit.
+     * @param prixUnitaire        Le prix unitaire du produit.
+     * @param unite               L'unité de mesure du produit.
+     * @param quantiteMaximale    La quantité maximale du produit.
+     */
+    public Produit(Integer codeProduit, String description, Boolean produitAlimentaire, Boolean isSolide,
+                   Double prixCoutant, Double prixUnitaire, String unite, Double quantiteMaximale) {
         this.codeProduit = codeProduit;
         this.description = description;
         this.produitAlimentaire = produitAlimentaire;
@@ -19,7 +32,7 @@ public class Produit {
         this.unite = unite;
         this.quantiteMaximale = quantiteMaximale;
     }
-
+    // Getters et Setters pour les attributs
     public Integer getCodeProduit() {
         return codeProduit;
     }

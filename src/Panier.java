@@ -12,7 +12,19 @@ public class Panier implements Comparable{
     private double []quantite;
     private String []unite;
 
-    public Panier(String identificationTransaction, String identifiantClient, Long tempsDepuisUnixEpoch, int nombreDeDifferentProduit, int[] codesProduit, double[] quantite, String[] unite) {
+    /**
+     * Constructeur de la classe Panier.
+     *
+     * @param identificationTransaction L'identifiant de la transaction du panier.
+     * @param identifiantClient         L'identifiant du client associé au panier.
+     * @param tempsDepuisUnixEpoch      Le temps écoulé depuis l'Unix Epoch (en millisecondes).
+     * @param nombreDeDifferentProduit  Le nombre de produits différents dans le panier.
+     * @param codesProduit              Les codes des produits présents dans le panier.
+     * @param quantite                  Les quantités des produits dans le panier.
+     * @param unite                     Les unités de mesure des produits dans le panier.
+     */
+    public Panier(String identificationTransaction, String identifiantClient, Long tempsDepuisUnixEpoch,
+                  int nombreDeDifferentProduit, int[] codesProduit, double[] quantite, String[] unite) {
         this.identificationTransaction = identificationTransaction;
         this.identifiantClient = identifiantClient;
         this.tempsDepuisUnixEpoch = tempsDepuisUnixEpoch;
@@ -22,6 +34,11 @@ public class Panier implements Comparable{
         this.unite = unite;
     }
 
+    /**
+     * Retourne une représentation sous forme de chaîne de caractères du panier.
+     *
+     * @return Une chaîne de caractères représentant le panier.
+     */
     @Override
     public String toString() {
         return "Panier{" +
@@ -35,10 +52,15 @@ public class Panier implements Comparable{
                 '}';
     }
 
+    /**
+     * Compare l'objet courant avec un autre objet de type Panier.
+     *
+     * @param o L'objet à comparer.
+     * @return Une valeur négative, zéro ou une valeur positive si l'objet courant est respectivement inférieur, égal ou supérieur à l'objet spécifié.
+     */
     public int compareTo(Object o) {
         Panier panierComparaison = (Panier) o;
-        return Long.compare( this.tempsDepuisUnixEpoch, panierComparaison.tempsDepuisUnixEpoch);
-
+        return Long.compare(this.tempsDepuisUnixEpoch, panierComparaison.tempsDepuisUnixEpoch);
     }
     public String getIdentificationTransaction() {
         return identificationTransaction;
