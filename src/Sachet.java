@@ -8,8 +8,7 @@ public class Sachet extends Contenant implements Comparable{
 
     @Override
     public int compareTo(Object o) {
-        if (o instanceof Sachet) {
-            Sachet potComparaison = (Sachet) o;
+        if (o instanceof Sachet potComparaison) {
 
             int quantityComparison = Double.compare(potComparaison.quantityUsed, this.quantityUsed);
             if (quantityComparison != 0) {
@@ -21,8 +20,6 @@ public class Sachet extends Contenant implements Comparable{
         return 0;
     }
     public String toString() {
-        return "" +
-                containerNumber +
-                "";
+        return String.valueOf(containerNumber);
     }
 }

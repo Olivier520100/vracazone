@@ -67,7 +67,6 @@ public interface InformationContenant {
 
     // Liste des clés des formats de pot
     ArrayList<Double> POT_FORMATS_KEYS = new ArrayList<>(POT_FORMATS.keySet());
-
     // Liste des clés des formats de sachet
     ArrayList<Double> SACHET_FORMATS_KEYS = new ArrayList<>(SACHET_FORMATS.keySet());
 

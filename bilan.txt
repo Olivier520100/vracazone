@@ -1,0 +1,33 @@
+PRODUITS                                 VENTES     COÛTANT    EMBALLAGE  PROFITS   
+Sucre blanc                              40.09      13.74      6.38       19.96     
+Sirop d'érable                           259.59     112.74     8.20       138.65    
+Mélasse                                  245.14     66.86      11.40      166.88    
+Persil séché                             29.07      8.21       2.05       18.81     
+Poivre noir                              101.22     33.60      5.09       62.53     
+Clous de girofle                         263.69     110.20     10.03      143.46    
+Caramel liquide                          904.59     226.15     48.75      629.69    
+Safran                                   853.23     460.92     5.77       386.55    
+Vinaigre blanc                           3693.65    858.12     371.25     2464.28   
+Limaille de fer                          14.36      3.88       0.71       9.77      
+Boutons à 4 trous en plastique           8977.69    2543.90    87.00      6346.78   
+Boutons à 4 trous en métal               17359.07   4263.63    76.30      13019.14  
+Sel de mer                               2941.73    1176.69    43.99      1721.05   
+Sel de l'Himalaya                        4612.74    1153.18    31.25      3428.30   
+Farine non blanchie                      4521.86    1884.11    69.80      2567.95   
+Kryptonite                               194250.00  159590.25  0.04       34659.71  
+Neige artificielle                       449.18     175.77     23.77      249.64    
+Pastilles de chocolat                    2830.44    1794.74    17.00      1018.70   
+Clous 2po galvanisés                     2961.49    1032.14    26.70      1902.66   
+Billes de verre                          2130.77    617.19     24.65      1488.93   
+Eau du Loch Ness                         5043.96    1120.88    20.45      3902.63   
+Basilic séché                            310.64     118.53     7.67       184.44    
+Huile à moteur 5w30                      1472.75    575.22     35.90      861.64    
+Savon à vaisselle                        596.63     120.53     191.00     285.10    
+Détergent à lessive                      7742.05    2751.19    82.27      4908.58   
+Assouplisseur liquide                    1256.23    434.27     39.65      782.31    
+Trombones métalliques                    304.30     117.04     3.30       183.96    
+Punaises                                 625.33     207.55     4.25       413.53    
+Gel désinfectant 70%                     11196.17   5557.81    243.45     5394.91   
+Nettoyeur à cuvettes                     8648.92    2682.26    319.05     5647.61   
+-------------------------------------------------------------------- 
+TOTAL                                    284636.58  189811.30  1817.12    93008.16  

@@ -14,7 +14,6 @@ public class Robot implements Unit, InformationContenant {
      * @return                Le colis contenant les pots et sachets remplis.
      */
     public Colis preparationPanier(Panier panier, HashMap<Integer, Produit> hashMapProduit) {
-
         ArrayList<Pot> pots = new ArrayList<>();
         ArrayList<Sachet> sachets = new ArrayList<>();
         double currentQuantityLeft = 0;
@@ -24,15 +23,11 @@ public class Robot implements Unit, InformationContenant {
         int conteurSachet = 1;
         Pot currentPot = null;
         Sachet currentSachet = null;
-
         int pointeurPanier = 0;
-
         while (pointeurPanier < panier.getCodesProduit().length && panier.getCodesProduit()[pointeurPanier] != 0) {
-
             currentQuantityLeft = 0;
             currentContenantNumber = 1;
             containerTypePointer = 0;
-
             if (unitVolume.containsKey(panier.getUnite()[pointeurPanier])) {
                 currentQuantityLeft = convertUnits((panier.getQuantite()[pointeurPanier]), panier.getUnite()[pointeurPanier], "ml");
                 while (currentQuantityLeft != 0) {

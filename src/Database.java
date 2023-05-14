@@ -9,15 +9,15 @@ import java.util.*;
 public class Database implements Unit{
 
 
-    private LinkedHashMap<String, Client> clientHashMap = new LinkedHashMap<String, Client>();
+    private final LinkedHashMap<String, Client> clientHashMap = new LinkedHashMap<String, Client>();
     // HashMap pour stocker les produits avec leur code produit comme clé
-    private LinkedHashMap<Integer, Produit> produitHashMap = new LinkedHashMap<Integer, Produit>();
+    private final LinkedHashMap<Integer, Produit> produitHashMap = new LinkedHashMap<Integer, Produit>();
 
     // HashMap pour stocker les paniers avec leur code transaction comme clé
-    private LinkedHashMap<String, Panier> panierHashMap = new LinkedHashMap<String, Panier>();
-    private ArrayList<FacturePanier> facturePanierArrayList = new ArrayList<>();
+    private final LinkedHashMap<String, Panier> panierHashMap = new LinkedHashMap<String, Panier>();
+    private final ArrayList<FacturePanier> facturePanierArrayList = new ArrayList<>();
 
-    private boolean dataLoaded = false;
+    private final boolean dataLoaded = false;
 
     public void importFiles(String fichierClients, String fichierProduits, String fichierPaniers) {
         loadClients(fichierClients);
@@ -78,7 +78,7 @@ public class Database implements Unit{
                     System.out.println("Erreur dans le fichier. Verifier" + description);
                 } else if (!(unitMasse.containsKey(unite)) && !(unitVolume.containsKey(unite))) {
                     System.out.println("Unite inconnue pour " + description + "avec" + unite);
-                } else if (prixCoutant >= ( prixUnitaire/1.2)) {
+                } else if (!(prixUnitaire/1.2 >= (prixCoutant))) {
                     System.out.println("Erreur dans le fichier. Le prix coûtant doit être inférieur d'au moins 20% au prix unitaire.");
                 } else {
                     // Créer un nouvel objet produit et l'ajouter au HashMap
@@ -242,7 +242,7 @@ public class Database implements Unit{
                 }
             }
             messageErreur += ("=================================================");
-            if (erreurDansFichier == true) {
+            if (erreurDansFichier) {
                 System.out.println(messageErreur);
             }
         } catch (FileNotFoundException e) {
@@ -279,11 +279,11 @@ public class Database implements Unit{
 
     public void printData() {
 
-        ArrayList<Panier> panierList = new ArrayList<>(panierHashMap.values());
+        ArrayList<Produit> produitList = new ArrayList<>(produitHashMap.values());
 
 
 
-        for (Panier panier : panierList) {
+        for (Produit panier : produitList) {
             System.out.println(panier);
             System.out.println(); // prints a newline character
         }

@@ -1,14 +1,13 @@
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Classe Entrepot
  * Cette classe représente un entrepôt qui contient des colis et peut démarrer la livraison de ces colis.
  */
-public class Entrepot {
+public class Entrepot{
 
     // Liste des colis dans l'entrepôt
-    private ArrayList<Colis> entrepotColis = new ArrayList<>();
+    private final Queue<Colis> entrepotColis = new LinkedList<>();
 
     /**
      * Cette méthode démarre le processus de livraison en utilisant un robot pour préparer les paniers
@@ -17,7 +16,7 @@ public class Entrepot {
      * @param panierHashMap   HashMap des paniers à livrer, mappés par leur identifiant.
      * @param produitHashMap  HashMap des produits disponibles, mappés par leur identifiant.
      */
-    public void demarrerLivraison(HashMap<String, Panier> panierHashMap, HashMap<Integer, Produit> produitHashMap){
+    public void demarrerLivraison(LinkedHashMap<String, Panier> panierHashMap, LinkedHashMap<Integer, Produit> produitHashMap){
 
         // Création d'une instance de robot
         Robot robot = new Robot();
@@ -31,9 +30,11 @@ public class Entrepot {
             entrepotColis.add(robot.preparationPanier(panier, produitHashMap));
         }
 
-        // Affichage des informations de chaque colis
-        for (Colis colis : entrepotColis) {
-            System.out.println(colis);
-        }
     }
+
+    public Queue<Colis> getEntrepotColis() {
+        return entrepotColis;
+    }
+
+
 }

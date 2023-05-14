@@ -1,14 +1,32 @@
 import java.text.DecimalFormat;
 
 public class FacturePanier {
-    private String idTransaction;
-    private String dateTime;
-    private double sousTotal;
-    private double taxes;
-    private double total;
+    private final String idTransaction;
+    private final String dateTime;
+    private final double sousTotal;
+    private final double taxes;
+    private final double total;
 
-    private static final double TAUX_TAXE = 0.15;
-    private static final DecimalFormat FORMAT_DECIMAL = new DecimalFormat("#0.00");
+    public String getIdTransaction() {
+        return idTransaction;
+    }
+
+    public String getDateTime() {
+        return dateTime;
+    }
+
+    public double getSousTotal() {
+        return sousTotal;
+    }
+
+    public double getTaxes() {
+        return taxes;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
     public FacturePanier(String idTransaction, String dateTime, double sousTotal, double taxes, double total) {
         this.idTransaction = idTransaction;
         this.dateTime = dateTime;
@@ -17,13 +35,4 @@ public class FacturePanier {
         this.total = total;
     }
 
-    @Override
-    public String toString() {
-        DecimalFormat FORMAT_DECIMAL = new DecimalFormat("#0.00");
-        String sousTotalTexte = FORMAT_DECIMAL.format(this.sousTotal);
-        String taxesTexte = FORMAT_DECIMAL.format(this.taxes);
-        String totalTexte = FORMAT_DECIMAL.format(this.total);
-
-        return idTransaction + "|" + dateTime + "|" + "$" + sousTotalTexte + "$|" + "$" + taxesTexte + "$|" + "$" + totalTexte + "$";
     }
-}
