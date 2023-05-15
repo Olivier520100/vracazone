@@ -1,46 +1,34 @@
-import javax.xml.crypto.Data;
-import java.security.GeneralSecurityException;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
-/**
- * Classe principale du programme.
- */
 public class Main {
     public static void main(String[] args) {
+        System.out.println("Database: \n");
         Database database = new Database();
-
-        // Importer les fichiers clients.dat, produits.dat et paniers.bin dans la base de données
-        database.importFiles("./database/clients.dat", "./database/produits.dat", "./database/paniers.bin");
-
-        // Générer les factures pour les paniers
-        database.generateFactures();
-
+        database.importFiles("./database/clients.dat", "./database/produits.dat","./database/paniers.bin");
         FichierGenerateur fichierGenerateur = new FichierGenerateur();
-
-        // Générer les fichiers de factures
-        FichierGenerateur.genererFactures(database.getFacturePanierArrayList());
+        System.out.println("\n");
+        database.generateFactures();
+        fichierGenerateur.genererFactures(database.getFacturePanierArrayList());
+        System.out.println("\n");
+        System.out.println("Robot: \n");
 
         Entrepot entrepot = new Entrepot();
-
-        // Démarrer la livraison en utilisant les paniers de la base de données et les produits associés
-        entrepot.demarrerLivraison((LinkedHashMap<String, Panier>) database.getPanierHashMap(),
-                (LinkedHashMap<Integer, Produit>) database.getProduitHashMap());
-
-        // Générer le registre des colis de l'entrepôt
-        FichierGenerateur.genererRegistre(entrepot.getEntrepotColis());
-
+        Map<String, Panier> paniers = database.getPanierHashMap();
+        Map<Integer, Produit> produits = database.getProduitHashMap();
+        entrepot.demarrerLivraison((LinkedHashMap<String, Panier>) paniers, (LinkedHashMap<Integer, Produit>) produits);
+        System.out.println("\n");
+        System.out.println("Bilan: \n");
+        fichierGenerateur.genererRegistre(entrepot.getEntrepotColis());
+        System.out.println("\n");
         Bilan bilan = new Bilan();
+        bilan.calculerBilan(entrepot.getEntrepotColis(), (LinkedHashMap<Integer, Produit>) produits);
+        fichierGenerateur.genererBilan(bilan.getProduitCoutHashMap(), (LinkedHashMap<Integer, Produit>) produits);
+        System.out.println("\n");
 
-        // Calculer le bilan en utilisant les colis de l'entrepôt et les produits associés de la base de données
-        bilan.calculerBilan(entrepot.getEntrepotColis(),
-                (LinkedHashMap<Integer, Produit>) database.getProduitHashMap());
+        Map<String, Client> clients = database.getClientHashMap();
+        fichierGenerateur.genererLivraison((LinkedHashMap<String, Panier>) paniers, (LinkedHashMap<String, Client>) clients);
 
-        // Générer le fichier de bilan
-        FichierGenerateur.genererBilan(bilan.getProduitCoutHashMap(),
-                (LinkedHashMap<Integer, Produit>) database.getProduitHashMap());
 
-        // Générer les fichiers de livraison en utilisant les paniers de la base de données et les clients associés
-        FichierGenerateur.genererLivraison((LinkedHashMap<String, Panier>) database.getPanierHashMap(),
-                (LinkedHashMap<String, Client>) database.getClientHashMap());
     }
 }

@@ -17,7 +17,7 @@ public class FichierGenerateur {
      * @param facturePanierArrayList La liste des factures de panier.
      */
     public static void genererFactures(ArrayList<FacturePanier> facturePanierArrayList) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("factures.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("./export/factures.txt"))) {
             for (FacturePanier facturePanier : facturePanierArrayList) {
                 // Écriture des informations de facture dans le fichier
                 writer.write(String.format("%-15s|%-20s| %-10.2f$| %-10.2f$| %-10.2f$|%n",
@@ -41,7 +41,7 @@ public class FichierGenerateur {
     public static void genererBilan(TreeMap<Integer, double[]> bilan, LinkedHashMap<Integer, Produit> produitLinkedHashMap) {
         double[] totaux = {0.0, 0.0, 0.0, 0.0};
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("bilan.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("./export/bilan.txt"))) {
             // Écriture de l'en-tête du bilan
             writer.write(String.format("%-40s %-10s %-10s %-10s %-10s%n", "PRODUITS", "VENTES", "COÛTANT", "EMBALLAGE", "PROFITS"));
             System.out.print(String.format("%-40s %-10s %-10s %-10s %-10s%n", "PRODUITS", "VENTES", "COÛTANT", "EMBALLAGE", "PROFITS"));
@@ -90,7 +90,7 @@ public class FichierGenerateur {
      * @param genererRegistre La file des colis.
      */
     public static void genererRegistre(Queue<Colis> genererRegistre) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("registre.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("./export/registre.txt"))) {
             for (Colis colis : genererRegistre) {
                 // Écriture des informations de chaque colis dans le fichier
                 writer.write(colis.toString());
@@ -108,17 +108,18 @@ public class FichierGenerateur {
      * @param clientLinkedHashMap    LinkedHashTable (pour l'ordre) des clients.
      */
     public static void genererLivraison(LinkedHashMap<String, Panier> panierLinkedHashMap, LinkedHashMap<String, Client> clientLinkedHashMap) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("livraison.txt"))) {
-            panierLinkedHashMap.forEach((key, value) -> {
-                try {
-                    // Écriture des informations de chaque livraison dans le fichier
-                    writer.write(panierLinkedHashMap.get(key).getIdentificationTransaction() + "|" +
-                            panierLinkedHashMap.get(key).getIdentifiantClient() + "|" +
-                            clientLinkedHashMap.get(panierLinkedHashMap.get(key).getIdentifiantClient()).getNomClient() + "\n");
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("./export/livraison.txt"))) {
+
+            List<Panier> panierList = new ArrayList<Panier>(panierLinkedHashMap.values());
+            panierList.sort(null);
+            for (Panier panier : panierList) {
+
+                writer.write(panier.getIdentificationTransaction() + "|" +
+                        panier.getIdentifiantClient() + "|" +
+                        clientLinkedHashMap.get(panier.getIdentifiantClient()).getNomClient() + "\n");
+            }
+
+
         } catch (IOException e) {
             System.err.println("Une erreur s'est produite lors de l'écriture dans le fichier.");
         }

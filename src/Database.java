@@ -56,9 +56,13 @@ public class Database implements Unit{
                 }
             }
         } catch (FileNotFoundException e) {
+
             System.out.println("Fichier client non trouvé");
+            System.exit(0);
         } catch (IOException e) {
             System.out.println("Erreur d'entrées-sorties");
+            System.exit(0);
+
         }
     }
 
@@ -104,8 +108,11 @@ public class Database implements Unit{
             }
         } catch (FileNotFoundException e) {
             System.out.println("Fichier produit non trouvé");
+            System.exit(0);
         } catch (IOException e) {
+
             System.out.println("Erreur d'entrées-sorties");
+            System.exit(0);
         }
     }
 
@@ -152,6 +159,8 @@ public class Database implements Unit{
             int errorType = 0;
             int codeProduitAvecErreur = 0;
             boolean erreurDansFichier = false;
+            double quantiteMaxException = 0;
+            String unitException = "";
             String messageErreur = ("PANIERS REJETÉS \n") + ("================================================= \n");
             // Boucle pour lire chaque produit du fichier produits.dat
             while (0 < fichierPanier.available()) {
@@ -160,6 +169,8 @@ public class Database implements Unit{
                 identifiantClient = fichierPanier.readUTF();
                 tempsDepuisUnixEpoch = fichierPanier.readLong();
                 nombreDeDifferentProduit = fichierPanier.readInt();
+                quantiteMaxException = 0;
+                unitException ="";
 
                 if (!clientHashMap.containsKey(identifiantClient)) {
                     errorType = 4;
@@ -176,101 +187,103 @@ public class Database implements Unit{
                     errorType = 1;
                     erreurDansFichier = true;
 
-                } else {
-                    conteurProduit = 0;
-                    indexProduit = 0;
-                    codesProduit.clear();
-                    quantite.clear();
-                    unite.clear();
-                    produitAcheterHashMap.clear();
-                    while (conteurProduit < nombreDeDifferentProduit) {
-                        currentCodeProduit = fichierPanier.readInt();
-                        currentQuantite = fichierPanier.readDouble();
-                        currentUnite = fichierPanier.readUTF();
-                        if (!produitHashMap.containsKey(currentCodeProduit)) {
-                            errorType = 5;
-                            erreurDansFichier = true;
-                            codeProduitAvecErreur = currentCodeProduit;
+                }
+                conteurProduit = 0;
+                indexProduit = 0;
+                codesProduit.clear();
+                quantite.clear();
+                unite.clear();
+                produitAcheterHashMap.clear();
+                while (conteurProduit < nombreDeDifferentProduit) {
+                    currentCodeProduit = fichierPanier.readInt();
+                    currentQuantite = fichierPanier.readDouble();
+                    currentUnite = fichierPanier.readUTF();
+                    if (!produitHashMap.containsKey(currentCodeProduit)) {
+                        errorType = 5;
+                        erreurDansFichier = true;
+                        codeProduitAvecErreur = currentCodeProduit;
 
-                        } else if (!unitMasse.containsKey(currentUnite) && !unitVolume.containsKey(currentUnite)) {
-                            errorType = 6;
-                            erreurDansFichier = true;
-                            codeProduitAvecErreur = currentCodeProduit;
+                    } else if (!unitMasse.containsKey(currentUnite) && !unitVolume.containsKey(currentUnite)) {
+                        errorType = 6;
+                        erreurDansFichier = true;
+                        codeProduitAvecErreur = currentCodeProduit;
+                    } else {
+                        if (!(produitAcheterHashMap.containsKey(currentCodeProduit))) {
+                            produitAcheterHashMap.put(currentCodeProduit, indexProduit);
+                            codesProduit.add(currentCodeProduit);
+                            quantite.add(currentQuantite);
+                            unite.add(currentUnite);
+                            indexProduit+=1;
                         } else {
-                            if (!(produitAcheterHashMap.containsKey(currentCodeProduit))) {
-                                produitAcheterHashMap.put(currentCodeProduit, indexProduit);
-                                codesProduit.add(currentCodeProduit);
-                                quantite.add(currentQuantite);
-                                unite.add(currentUnite);
-                                indexProduit+=1;
-                            } else {
-                                double valeurMiseAJour = quantite.get(produitAcheterHashMap.get(currentCodeProduit)) + convertUnits(currentQuantite, currentUnite, unite.get(produitAcheterHashMap.get(currentCodeProduit)));
-                                quantite.set(produitAcheterHashMap.get(currentCodeProduit), valeurMiseAJour);
-                            }
-                            if (quantite.get(produitAcheterHashMap.get(currentCodeProduit)) > convertUnits(produitHashMap.get(currentCodeProduit).getQuantiteMaximale(), produitHashMap.get(currentCodeProduit).getUnite(), unite.get(produitAcheterHashMap.get(currentCodeProduit)))) {
-                                errorType = 7;
-                                erreurDansFichier = true;
-                                codeProduitAvecErreur = currentCodeProduit;
-                            }
-
+                            double valeurMiseAJour = quantite.get(produitAcheterHashMap.get(currentCodeProduit)) + convertUnits(currentQuantite, currentUnite, unite.get(produitAcheterHashMap.get(currentCodeProduit)));
+                            quantite.set(produitAcheterHashMap.get(currentCodeProduit), valeurMiseAJour);
                         }
-                        conteurProduit++;
+                        if (quantite.get(produitAcheterHashMap.get(currentCodeProduit)) > convertUnits(produitHashMap.get(currentCodeProduit).getQuantiteMaximale(), produitHashMap.get(currentCodeProduit).getUnite(), unite.get(produitAcheterHashMap.get(currentCodeProduit)))) {
+                            errorType = 7;
+                            erreurDansFichier = true;
+                            quantiteMaxException = quantite.get(produitAcheterHashMap.get(currentCodeProduit));
+                            unitException = unite.get(produitAcheterHashMap.get(currentCodeProduit));
+                            codeProduitAvecErreur = currentCodeProduit;
+                        }
+
+                    }
+                    conteurProduit++;
+                }
+
+
+            switch (errorType) {
+                case 0:
+                    // Ajouter les informations du panier à l'objet Panier
+                    int[] codeProduitArray = codesProduit.stream().mapToInt(i -> i).toArray();
+                    double[] quantiteArray = quantite.stream().mapToDouble(d -> d).toArray();
+                    String[] uniteArray = unite.toArray(new String[0]);
+
+                    for (int i = 0; i < codeProduitArray.length; i++) {
+                        Produit produit = produitHashMap.get(codeProduitArray[i]);
+                        double quantitePourConvertir = convertUnits(quantiteArray[i], uniteArray[i], produit.getUnite());
+                        codeProduitArray[i] = produit.getCodeProduit();
+                        quantiteArray[i] = quantitePourConvertir;
+                        uniteArray[i] = produit.getUnite();
                     }
 
-                }
-                switch (errorType) {
-                    case 0:
-                        // Ajouter les informations du panier à l'objet Panier
-                        int[] codeProduitArray = codesProduit.stream().mapToInt(i -> i).toArray();
-                        double[] quantiteArray = quantite.stream().mapToDouble(d -> d).toArray();
-                        String[] uniteArray = unite.toArray(new String[0]);
+                    Panier panier = new Panier(identificationTransaction, identifiantClient, tempsDepuisUnixEpoch, nombreDeDifferentProduit, codeProduitArray, quantiteArray, uniteArray);
+                    panierHashMap.put(identificationTransaction, panier);
+                    break;
+                case 1:
 
-                        for (int i = 0; i < codeProduitArray.length; i++) {
-                            Produit produit = produitHashMap.get(codeProduitArray[i]);
-                            double quantitePourConvertir = convertUnits(quantiteArray[i], uniteArray[i], produit.getUnite());
-                            codeProduitArray[i] = produit.getCodeProduit();
-                            quantiteArray[i] = quantitePourConvertir;
-                            uniteArray[i] = produit.getUnite();
-                        }
+                    messageErreur += (identificationTransaction + " Le nombre de produit est invalide \n");
 
-                        Panier panier = new Panier(identificationTransaction, identifiantClient, tempsDepuisUnixEpoch, nombreDeDifferentProduit, codeProduitArray, quantiteArray, uniteArray);
-                        panierHashMap.put(identificationTransaction, panier);
-                        break;
-                    case 1:
+                    break;
+                case 2:
 
-                        messageErreur += (identificationTransaction + " Le nombre de produit est invalide \n");
+                    messageErreur +=(identificationTransaction + " Le temps depuis Unix Epoch est invalid\n");
 
-                        break;
-                    case 2:
+                    break;
+                case 3:
 
-                        messageErreur +=(identificationTransaction + " Le temps depuis Unix Epoch est invalid\n");
+                    messageErreur +=(identificationTransaction + " L'identification de transaction existe déjà.\n");
 
-                        break;
-                    case 3:
+                    break;
+                case 4:
 
-                        messageErreur +=(identificationTransaction + " L'identification de transaction existe déjà.\n");
+                    messageErreur +=(identificationTransaction + " Identifiant de client invalide (" + identifiantClient + ").\n");
 
-                        break;
-                    case 4:
+                    break;
+                case 5:
 
-                        messageErreur +=(identificationTransaction + " Identifiant de client invalide (" + identifiantClient + ").\n");
+                    messageErreur += (identificationTransaction + " Produit invalide (" + codeProduitAvecErreur + "). \n");
+                    break;
+                case 6:
 
-                        break;
-                    case 5:
-
-                        messageErreur += (identificationTransaction + " Produit invalide (" + codeProduitAvecErreur + "). \n");
-                        break;
-                    case 6:
-
-                        messageErreur +=(identificationTransaction + " Unité inconnue.\n");
-                        break;
-                    case 7:
-                        messageErreur +=(identificationTransaction + " Quantité non autorisée (produit " + codeProduitAvecErreur + ").\n");
-                        break;
-                    default:
-                        System.out.println("Erreur : Type d'erreur inconnu.");
-                        System.out.println("Erreur dans :" + identificationTransaction);
-                        break;
+                    messageErreur +=(identificationTransaction + " Unité inconnue.\n");
+                    break;
+                case 7:
+                    messageErreur +=(identificationTransaction + " Quantité non autorisée de " + quantiteMaxException + " " + unitException + " (produit " + codeProduitAvecErreur + ").\n");
+                    break;
+                default:
+                    System.out.println("Erreur : Type d'erreur inconnu.");
+                    System.out.println("Erreur dans :" + identificationTransaction);
+                    break;
                 }
             }
             messageErreur += ("=================================================");
@@ -279,8 +292,10 @@ public class Database implements Unit{
             }
         } catch (FileNotFoundException e) {
             System.out.println("Fichier paniers non trouvé");
+            System.exit(0);
         } catch (IOException e) {
             System.out.println("Erreur d'entrées-sorties");
+            System.exit(0);
         }
     }
 
@@ -289,7 +304,9 @@ public class Database implements Unit{
     // Méthode pour générer les factures des paniers
     public void generateFactures() {
         final double TAUX_TAXE = 0.15;
-        for (Panier panier : panierHashMap.values()) {
+        List<Panier> panierList = new ArrayList<Panier>(panierHashMap.values());
+        panierList.sort(null);
+        for (Panier panier : panierList) {
             String idTransaction = panier.getIdentificationTransaction();
             String dateTime = unixATimeStamp(panier.getTempsDepuisUnixEpoch() / 1000);
             double sousTotal = 0.0;

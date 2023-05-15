@@ -13,27 +13,32 @@ public class Robot implements Unit, InformationContenant {
      * @param hashMapProduit  HashMap des produits disponibles, mappés par leur identifiant.
      * @return                Le colis contenant les pots et sachets remplis.
      */
+
+    int conteurPot = 1;
+    int conteurSachet = 1;
     public Colis preparationPanier(Panier panier, HashMap<Integer, Produit> hashMapProduit) {
         ArrayList<Pot> pots = new ArrayList<>();
         ArrayList<Sachet> sachets = new ArrayList<>();
         double currentQuantityLeft = 0;
         int currentContenantNumber = 1;
         int containerTypePointer = 0;
-        int conteurPot = 1;
-        int conteurSachet = 1;
         Pot currentPot = null;
         Sachet currentSachet = null;
         int pointeurPanier = 0;
+        System.out.println("Panier: " + (panier.getIdentificationTransaction()));
         while (pointeurPanier < panier.getCodesProduit().length && panier.getCodesProduit()[pointeurPanier] != 0) {
+
             currentQuantityLeft = 0;
             currentContenantNumber = 1;
             containerTypePointer = 0;
+
             if (unitVolume.containsKey(panier.getUnite()[pointeurPanier])) {
+                System.out.println("Quantite: " + (panier.getQuantite()[pointeurPanier]));
                 currentQuantityLeft = convertUnits((panier.getQuantite()[pointeurPanier]), panier.getUnite()[pointeurPanier], "ml");
                 while (currentQuantityLeft != 0) {
                     containerTypePointer = 0;
                     while (containerTypePointer < POT_FORMATS_KEYS.toArray().length) {
-                        if (currentQuantityLeft > POT_FORMATS_KEYS.get(containerTypePointer) * 0.5 && (containerTypePointer < POT_FORMATS_KEYS.toArray().length - 1)) {
+                        if (currentQuantityLeft >= POT_FORMATS_KEYS.get(containerTypePointer) * 0.5 && (containerTypePointer < POT_FORMATS_KEYS.toArray().length - 1)) {
                             if (currentQuantityLeft - POT_FORMATS_KEYS.get(containerTypePointer) < 0) {
                                 currentPot = new Pot(POT_FORMATS_KEYS.get(containerTypePointer), currentQuantityLeft, conteurPot, panier.getCodesProduit()[pointeurPanier]);
                                 currentQuantityLeft = 0;
@@ -65,7 +70,7 @@ public class Robot implements Unit, InformationContenant {
                 while (currentQuantityLeft != 0) {
                     containerTypePointer = 0;
                     while (containerTypePointer < SACHET_FORMATS_KEYS.toArray().length) {
-                        if (currentQuantityLeft > SACHET_FORMATS_KEYS.get(containerTypePointer) * 0.5 && (containerTypePointer < SACHET_FORMATS_KEYS.toArray().length - 1)) {
+                        if (currentQuantityLeft >= SACHET_FORMATS_KEYS.get(containerTypePointer) * 0.5 && (containerTypePointer < SACHET_FORMATS_KEYS.toArray().length - 1)) {
                             if (currentQuantityLeft - SACHET_FORMATS_KEYS.get(containerTypePointer) < 0) {
                                 currentSachet = new Sachet(SACHET_FORMATS_KEYS.get(containerTypePointer), currentQuantityLeft, conteurSachet, panier.getCodesProduit()[pointeurPanier]);
                                 currentQuantityLeft = 0;
